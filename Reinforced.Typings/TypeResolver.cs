@@ -15,10 +15,20 @@ namespace Reinforced.Typings
     /// </summary>
     public sealed class TypeResolver
     {
+        // TYPESCRIPT
         private static readonly RtSimpleTypeName AnyType = new RtSimpleTypeName("any");
         private static readonly RtSimpleTypeName NumberType = new RtSimpleTypeName("number");
         private static readonly RtSimpleTypeName StringType = new RtSimpleTypeName("string");
         private static readonly RtSimpleTypeName UnknownType = new RtSimpleTypeName("unknown");
+        
+        // DART
+        private static readonly RtSimpleTypeName AnyTypeDart = new RtSimpleTypeName("dynamic");
+        private static readonly RtSimpleTypeName NumberTypeDart = new RtSimpleTypeName("num");
+        private static readonly RtSimpleTypeName StringTypeDart = new RtSimpleTypeName("String");
+        private static readonly RtSimpleTypeName UnknownTypeDart = new RtSimpleTypeName("dynamic");
+        private static readonly RtSimpleTypeName IntegerTypeDart = new RtSimpleTypeName("int");
+        private static readonly RtSimpleTypeName DoubleTypeDart = new RtSimpleTypeName("double");
+        private static readonly RtSimpleTypeName ObjectTypeDart = new RtSimpleTypeName("Object");
 
         /// <summary>
         /// Hash set of all numeric types
@@ -72,7 +82,7 @@ namespace Reinforced.Typings
             typeof (ulong?)
         });
 
-        private readonly Dictionary<Type, RtTypeName> _resolveCache = new Dictionary<Type, RtTypeName>
+        private readonly Dictionary<Type, RtTypeName> _resolveCacheTs = new Dictionary<Type, RtTypeName>
         {
             {typeof (object), AnyType},
             {typeof (void), new RtSimpleTypeName("void")},
@@ -91,6 +101,26 @@ namespace Reinforced.Typings
             {typeof (double), NumberType},
             {typeof (decimal), NumberType}
         };
+        
+        private readonly Dictionary<Type, RtTypeName> _resolveCacheDart = new Dictionary<Type, RtTypeName>
+        {
+            {typeof (object), ObjectTypeDart},
+            {typeof (void), new RtSimpleTypeName("void")},
+            {typeof (string), StringTypeDart},
+            {typeof (char),StringTypeDart},
+            {typeof (bool), new RtSimpleTypeName("bool")},
+            {typeof (byte), IntegerTypeDart},
+            {typeof (sbyte), IntegerTypeDart},
+            {typeof (short), IntegerTypeDart},
+            {typeof (ushort), IntegerTypeDart},
+            {typeof (int), IntegerTypeDart},
+            {typeof (uint), IntegerTypeDart},
+            {typeof (long), IntegerTypeDart},
+            {typeof (ulong), IntegerTypeDart},
+            {typeof (float), DoubleTypeDart},
+            {typeof (double), DoubleTypeDart},
+            {typeof (decimal), DoubleTypeDart}
+        };
 
         private readonly RtSimpleTypeName _anyOrUnknown;
 
@@ -99,6 +129,8 @@ namespace Reinforced.Typings
             get { return _file.Context; }
         }
 
+        private Dictionary<Type, RtTypeName> ResolveCache => Context.IsDartLang ? _resolveCacheDart : _resolveCacheTs;
+        
         private readonly ExportedFile _file;
 
         /// <summary>
@@ -132,7 +164,7 @@ namespace Reinforced.Typings
 
         private RtTypeName Cache(Type t, RtTypeName name)
         {
-            _resolveCache[t] = name;
+            ResolveCache[t] = name;
             return name;
         }
 
@@ -212,7 +244,7 @@ namespace Reinforced.Typings
                 return new RtSimpleTypeName(t.Name);
             }
 
-            if (materializedGenerics == null && _resolveCache.ContainsKey(t)) return _resolveCache[t];
+            if (materializedGenerics == null && ResolveCache.ContainsKey(t)) return ResolveCache[t];
 
             var bp = Context.Project.Blueprint(t, false);
             if (bp != null && bp.ThirdParty != null)

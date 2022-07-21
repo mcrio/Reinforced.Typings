@@ -100,6 +100,10 @@ namespace Reinforced.Typings.Generators
             {
                 this.FillInitialization(element, result, resolver, t, tp);
             }
+
+            
+            type.IsNullable = propName.IsNullable;
+
             result.Identifier = propName;
             result.AccessModifier = Context.SpecialCase ? AccessModifier.Public : element.GetModifier();
             result.Type = type;

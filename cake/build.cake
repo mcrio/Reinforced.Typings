@@ -1,6 +1,6 @@
 #addin "Cake.FileHelpers"
 var target = Argument("target", "Build");
-const string version = "1.6.1";
+const string version = "1.6.137";
 
 Task("Clean")
   .Does(() =>
@@ -35,9 +35,9 @@ const string NET45 = "net45";
 const string NET50 = "net5.0";
 const string NET60 = "net6.0";
 
-var cliFrameworks = new[] { NETCORE10, NETCORE11, NET45, NET461,NETCORE20,NETCORE21,NETCORE22,NETCORE30,NETCORE31, NET50, NET60 };
-var rtFrameworks = new[]  { NETCORE10, NETCORE11, NETSTANDARD15,NETSTANDARD20,NETCORE20,NETCORE21,NETCORE22,NETCORE30,NETCORE31,NET45, NET461, NET50, NET60};
-var taskFrameworks = new[] { NET46, NETSTANDARD20 };
+var cliFrameworks = new[] {  NET50, NET60 };
+var rtFrameworks = new[]  { NETSTANDARD20, NET50, NET60};
+var taskFrameworks = new[] {  NETSTANDARD20 };
 
 var netCore = new HashSet<string>(new[]{NETSTANDARD15,NETSTANDARD20,NETCORE10,NETCORE11,NETCORE20,NETCORE21,NETCORE22,NETCORE30,NETCORE31,NET50,NET60});
 var netCoreApp = new HashSet<string>(new[]{NETCORE20,NETCORE21,NETCORE22,NETCORE30,NETCORE31,NET50,NET60});
@@ -223,10 +223,12 @@ Task("Build")
 
   var nugetSettings = new ProcessSettings
     {     
-      Arguments = "pack ../package/Reinforced.Typings.nuspec -OutputDirectory \"../\"" 
+      Arguments = "nuget.exe pack ../package/Reinforced.Typings.nuspec -OutputDirectory \"../\""
+      //Arguments = "pack ../Reinforced.Typings.sln --no-build --no-restore -p:NuspecFile=../package/Reinforced.Typings.nuspec --output=\"../\"" 
     };
 
-  using(var process = StartAndReturnProcess("nuget", nugetSettings))
+  using(var process = StartAndReturnProcess("mono", nugetSettings))
+  //using(var process = StartAndReturnProcess("dotnet", nugetSettings))
   {
       process.WaitForExit();      
   }

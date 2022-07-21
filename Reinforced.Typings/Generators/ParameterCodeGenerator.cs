@@ -63,6 +63,9 @@ namespace Reinforced.Typings.Generators
                 else
                     result.DefaultValue = defaultValue;
             }
+
+            result.Type.IsNullable = result.Identifier.IsNullable;
+            
             AddDecorators(result, Context.CurrentBlueprint.DecoratorsFor(element));
             return result;
         }

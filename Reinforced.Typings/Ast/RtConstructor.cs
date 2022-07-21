@@ -21,6 +21,8 @@ namespace Reinforced.Typings.Ast
         /// When true, super(...) call will be generated. Otherwise will not
         /// </summary>
         public bool NeedsSuperCall { get; set; }
+        
+        public string ClassName { get; set; }
 
         /// <summary>
         /// Constructs new instance of AST node

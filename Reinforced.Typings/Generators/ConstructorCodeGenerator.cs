@@ -41,6 +41,8 @@ namespace Reinforced.Typings.Generators
                 result.Documentation = jsdoc;
             }
 
+            result.ClassName = element.Name;
+            
             var p = element.GetParameters();
             foreach (var param in p)
             {

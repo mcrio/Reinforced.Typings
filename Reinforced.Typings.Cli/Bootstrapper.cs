@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Reinforced.Typings.Ast.TypeNames;
 #if NETCORE
 using System.Runtime.Loader;
 #endif
 using Reinforced.Typings.Exceptions;
 using Reinforced.Typings.Fluent;
+using Reinforced.Typings.Visitors.Dart;
 
 namespace Reinforced.Typings.Cli
 {
@@ -99,17 +101,65 @@ namespace Reinforced.Typings.Cli
                 }
 
                 _suppressedWarnings = ParseSuppressedWarnings(parameters.SuppressedWarnings);
-                var settings = InstantiateExportContext(parameters);
-                ResolveFluentMethod(settings,parameters);
-                TsExporter exporter = new TsExporter(settings);
-                exporter.Export();
-                _assemblyManager.TurnOffAdditionalResolvation();
-                foreach (var rtWarning in settings.Warnings)
+
                 {
-                    var msg = VisualStudioFriendlyErrorMessage.Create(rtWarning);
-                    Console.WriteLine(msg.ToString());
+                    var settings = InstantiateExportContext(parameters);
+                    ResolveFluentMethod(settings,parameters);
+                    TsExporter exporter = new TsExporter(settings);
+                    exporter.Export();
+
+                    foreach (var rtWarning in settings.Warnings)
+                    {
+                        var msg = VisualStudioFriendlyErrorMessage.Create(rtWarning);
+                        Console.WriteLine(msg.ToString());
+                    }
+
                 }
-                ReleaseReferencesTempFile(parameters);
+
+                {
+                    parameters.TargetFile = $"{parameters.TargetFile}.dart";
+                    var settings = InstantiateExportContext(parameters);
+
+                    settings.Global.VisitorType = typeof(DartExportVisitor);
+                    settings.IsDartLang = true;
+                    
+                    // Fix substitutions for known types
+                    {
+                        const string typeNameLookup = "string";
+                        List<KeyValuePair<Type, RtTypeName>> pairs = settings
+                                                                         .Project
+                                                                         ?.GlobalSubstitutions
+                                                                         ?.Where(
+                                                                             item => item.Value is RtSimpleTypeName simple 
+                                                                                 && simple.TypeName.Equals(typeNameLookup, StringComparison.Ordinal)
+                                                                         )
+                                                                         .ToList()
+                                                                     ?? new List<KeyValuePair<Type, RtTypeName>>();
+                        pairs.ForEach(pair =>
+                        {
+                            if (pair.Value is RtSimpleTypeName rtSimple)
+                            {
+                                var newSub = new RtSimpleTypeName(rtSimple.GenericArguments, rtSimple.Prefix, "String");
+                                settings.Project.GlobalSubstitutions.Remove(pair.Key);
+                                settings.Project.GlobalSubstitutions.Add(pair.Key, newSub);
+                            } 
+                        });
+                    }
+
+                    ResolveFluentMethod(settings,parameters);
+                    TsExporter exporter = new TsExporter(settings);
+                    exporter.Export();
+                    
+                    foreach (var rtWarning in settings.Warnings)
+                    {
+                        var msg = VisualStudioFriendlyErrorMessage.Create(rtWarning);
+                        Console.WriteLine(msg.ToString());
+                    }
+                    
+                }
+                
+                _assemblyManager.TurnOffAdditionalResolvation();
+                ReleaseReferencesTempFile(parameters);    
             }
             catch (RtException rtException)
             {

@@ -88,6 +88,34 @@ namespace Reinforced.Typings.Generators
                         {
                             ((RtClass)result).Extendee = inferredBaseType;
                         }
+                        
+                        var tmpItem = new RtClass();
+                        ExportProperties(
+                            tmpItem,
+                            baseType,
+                            resolver,
+                            swtch
+                        );
+                        ExportFields(
+                            tmpItem,
+                            baseType,
+                            resolver,
+                            swtch
+                        );
+                        tmpItem.Members.ForEach(item =>
+                        {
+                            if (!(item is RtField itemField))
+                            {
+                                return;
+                            }
+                            if (inferredBaseType
+                                .Members
+                                .OfType<RtField>()
+                                .All(node => node.Identifier.IdentifierName != itemField.Identifier.IdentifierName))
+                            {
+                                inferredBaseType.Members.Add(item);
+                            }
+                        });
                     }
                 }
 
@@ -137,7 +165,6 @@ namespace Reinforced.Typings.Generators
             var ifaces = type._GetInterfaces();
             foreach (var iface in ifaces)
             {
-
                 RtTypeName inferredBaseType = null;
                 if (iface._IsGenericType())
                 {

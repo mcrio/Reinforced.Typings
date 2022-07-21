@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Reinforced.Typings.Fluent;
+
 // ReSharper disable CheckNamespace
 namespace Reinforced.Typings
 {
@@ -10,8 +11,10 @@ namespace Reinforced.Typings
     /// </summary>
     public partial class ExportContext
     {
+        public bool IsDartLang { get; set; } = false;
 
         private bool _hierarchical;
+
         /// <summary>
         ///     True to create project hierarchy in target folder.
         ///     False to store generated typings in single file
@@ -27,6 +30,7 @@ namespace Reinforced.Typings
         }
 
         private string _targetDirectory;
+
         /// <summary>
         ///     Target directory where to store generated typing files.
         ///     This parameter is not used when Hierarcy is false
@@ -40,8 +44,9 @@ namespace Reinforced.Typings
                 _targetDirectory = value;
             }
         }
-        
+
         private string _targetFile;
+
         /// <summary>
         ///     Target file where to store generated sources.
         ///     This parameter is not used when Hierarchy is true
@@ -55,8 +60,9 @@ namespace Reinforced.Typings
                 _targetFile = value;
             }
         }
-        
+
         private Action<ConfigurationBuilder> _configurationMethod;
+
         /// <summary>
         ///     Fluent configuration method
         /// </summary>
@@ -71,6 +77,7 @@ namespace Reinforced.Typings
         }
 
         private string _documentationFilePath;
+
         /// <summary>
         ///     Path to assembly's XMLDOC file
         /// </summary>
@@ -83,8 +90,9 @@ namespace Reinforced.Typings
                 _documentationFilePath = value;
             }
         }
-        
+
         private HashSet<int> _suppressedWarningCodes = new HashSet<int>();
+
         /// <summary>
         ///     Gets or sets the list of suppressed warning codes
         /// </summary>
@@ -97,6 +105,5 @@ namespace Reinforced.Typings
                 _suppressedWarningCodes = new HashSet<int>(value);
             }
         }
-
     }
 }

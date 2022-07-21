@@ -118,7 +118,8 @@ namespace Reinforced.Typings
         public List<RtImport> Imports { get; private set; }
 
 
-        internal Dictionary<Type, RtTypeName> GlobalSubstitutions { get; private set; }
+        public Dictionary<Type, RtTypeName> GlobalSubstitutions { get; private set; }
+
         internal Dictionary<Type, Func<Type, TypeResolver, RtTypeName>> GlobalGenericSubstitutions { get; private set; }
 
         /// <summary>

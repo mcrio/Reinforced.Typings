@@ -100,7 +100,7 @@ namespace Reinforced.Typings.Ast.TypeNames
 
         private bool Equals(RtSimpleTypeName other)
         {
-            return Prefix == other.Prefix && TypeName == other.TypeName;
+            return Prefix == other.Prefix && TypeName == other.TypeName && IsNullable == other.IsNullable;
         }
 
         /// <summary>Determines whether the specified object is equal to the current object.</summary>
@@ -121,6 +121,7 @@ namespace Reinforced.Typings.Ast.TypeNames
                 var hashCode = (_genericArguments != null ? _genericArguments.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Prefix != null ? Prefix.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (TypeName != null ? TypeName.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (IsNullable != null ? IsNullable.GetHashCode() : 0);
                 return hashCode;
             }
         }
