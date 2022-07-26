@@ -99,7 +99,7 @@ namespace Reinforced.Typings.Visitors.Dart
 
             WriteLine("");
             AppendTabs();
-            WriteLine("factory " + node.Name.TypeName + ".fromJson(Map<String, Object?> json) => _$" +
+            WriteLine("factory " + node.Name.TypeName + ".fromJson(Map<String, dynamic> json) => _$" +
                       node.Name.TypeName + "FromJson(json);");
             
             UnTab();

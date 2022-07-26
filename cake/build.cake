@@ -1,6 +1,6 @@
 #addin "Cake.FileHelpers"
 var target = Argument("target", "Build");
-const string version = "1.6.137";
+const string version = "1.6.138";
 
 Task("Clean")
   .Does(() =>
@@ -46,9 +46,9 @@ const string CliNetCoreProject = "../Reinforced.Typings.Cli/Reinforced.Typings.C
 const string RtNetCoreProject = "../Reinforced.Typings/Reinforced.Typings.NETCore.csproj";
 const string IntegrateProject = "../Reinforced.Typings.Integrate/Reinforced.Typings.Integrate.NETCore.csproj";
 const string tfParameter = "TargetFrameworks";
-string tfRgx = $"<{tfParameter}>[a-zA-Z0-9;.]*</{tfParameter}>"; 
+string tfRgx = $"<{tfParameter}>[a-zA-Z0-9;.]*</{tfParameter}>";
 const string tfSingleParameter = "TargetFramework";
-string tfsRgx = $"<{tfSingleParameter}>[a-zA-Z0-9;.]*</{tfSingleParameter}>"; 
+string tfsRgx = $"<{tfSingleParameter}>[a-zA-Z0-9;.]*</{tfSingleParameter}>";
 
 Task("Reset")
   .IsDependentOn("UpdateVersions")
@@ -56,10 +56,10 @@ Task("Reset")
   .Does(() =>
 {
 	var fw = NET461;
-	ReplaceRegexInFiles(CliNetCoreProject,tfRgx,$"<{tfParameter}>{fw}</{tfParameter}>");       
-    ReplaceRegexInFiles(RtNetCoreProject,tfRgx,$"<{tfParameter}>{fw}</{tfParameter}>"); 
-    ReplaceRegexInFiles(CliNetCoreProject,tfsRgx,$"<{tfSingleParameter}>{fw}</{tfSingleParameter}>");       
-    ReplaceRegexInFiles(RtNetCoreProject,tfsRgx,$"<{tfSingleParameter}>{fw}</{tfSingleParameter}>"); 
+	ReplaceRegexInFiles(CliNetCoreProject,tfRgx,$"<{tfParameter}>{fw}</{tfParameter}>");
+    ReplaceRegexInFiles(RtNetCoreProject,tfRgx,$"<{tfParameter}>{fw}</{tfParameter}>");
+    ReplaceRegexInFiles(CliNetCoreProject,tfsRgx,$"<{tfSingleParameter}>{fw}</{tfSingleParameter}>");
+    ReplaceRegexInFiles(RtNetCoreProject,tfsRgx,$"<{tfSingleParameter}>{fw}</{tfSingleParameter}>");
 });
 
 Task("PackageClean")
@@ -83,7 +83,7 @@ Task("UpdateVersions")
     foreach(var par in new[]{"AssemblyVersion","FileVersion","InformationalVersion"}){
       var rgx = $"<{par}>[0-9.]*</{par}>";
       ReplaceRegexInFiles(p,rgx,$"<{par}>{version}</{par}>");
-    }    
+    }
   }
 });
 
@@ -92,7 +92,7 @@ Task("BuildIntegrate")
 .Does(()=>{
   foreach(var fw in taskFrameworks){
 	  DotNetCoreMSBuildSettings mbs = null;
-          
+
       if (netCore.Contains(fw)){
 		var ac = "NETCORE;" + fw.ToUpperInvariant().Replace(".","_");
 		if (netCoreApp.Contains(fw)) ac += ";NETCORE_APP";
@@ -103,14 +103,14 @@ Task("BuildIntegrate")
     DotNetCorePublish(IntegrateProject, new DotNetCorePublishSettings
     {
       Verbosity = DotNetCoreVerbosity.Quiet,
-      Configuration = RELEASE,	  
+      Configuration = RELEASE,
       MSBuildSettings = mbs,
-      OutputDirectory = System.IO.Path.Combine(buildPath, fw),      
+      OutputDirectory = System.IO.Path.Combine(buildPath, fw),
       Framework = fw
-    });    
-    
-  }  
-  
+    });
+
+  }
+
 });
 
 Task("Build")
@@ -126,13 +126,13 @@ Task("Build")
       Information("Building CLI for {0}",fw);
       Information("---------");
 
-      ReplaceRegexInFiles(CliNetCoreProject,tfRgx,$"<{tfParameter}>{fw}</{tfParameter}>");       
-      ReplaceRegexInFiles(RtNetCoreProject,tfRgx,$"<{tfParameter}>{fw}</{tfParameter}>"); 
-      ReplaceRegexInFiles(CliNetCoreProject,tfsRgx,$"<{tfSingleParameter}>{fw}</{tfSingleParameter}>");       
-      ReplaceRegexInFiles(RtNetCoreProject,tfsRgx,$"<{tfSingleParameter}>{fw}</{tfSingleParameter}>"); 
+      ReplaceRegexInFiles(CliNetCoreProject,tfRgx,$"<{tfParameter}>{fw}</{tfParameter}>");
+      ReplaceRegexInFiles(RtNetCoreProject,tfRgx,$"<{tfParameter}>{fw}</{tfParameter}>");
+      ReplaceRegexInFiles(CliNetCoreProject,tfsRgx,$"<{tfSingleParameter}>{fw}</{tfSingleParameter}>");
+      ReplaceRegexInFiles(RtNetCoreProject,tfsRgx,$"<{tfSingleParameter}>{fw}</{tfSingleParameter}>");
 
       DotNetCoreMSBuildSettings mbs = null;
-          
+
       if (netCore.Contains(fw)){
 		var ac = "NETCORE;" + fw.ToUpperInvariant().Replace(".","_");
 		if (netCoreApp.Contains(fw)) ac += ";NETCORE_APP";
@@ -140,12 +140,12 @@ Task("Build")
           .WithProperty("RtAdditionalConstants",ac)
           .WithProperty("RtNetCore","True");
       }
-      DotNetCorePublish(CliNetCoreProject, new DotNetCorePublishSettings {  
-        Configuration = RELEASE, 
+      DotNetCorePublish(CliNetCoreProject, new DotNetCorePublishSettings {
+        Configuration = RELEASE,
         MSBuildSettings = mbs,
         Framework = fw,
         Verbosity = DotNetCoreVerbosity.Quiet,
-        OutputDirectory = System.IO.Path.Combine(toolsPath, fw)        
+        OutputDirectory = System.IO.Path.Combine(toolsPath, fw)
       });
   }
 
@@ -156,9 +156,9 @@ Task("Build")
       Information("Building lib for {0}",fw);
       Information("---------");
 
-      ReplaceRegexInFiles(RtNetCoreProject,tfRgx,$"<{tfParameter}>{fw}</{tfParameter}>");  
-      ReplaceRegexInFiles(RtNetCoreProject,tfsRgx,$"<{tfSingleParameter}>{fw}</{tfSingleParameter}>"); 
-      
+      ReplaceRegexInFiles(RtNetCoreProject,tfRgx,$"<{tfParameter}>{fw}</{tfParameter}>");
+      ReplaceRegexInFiles(RtNetCoreProject,tfsRgx,$"<{tfSingleParameter}>{fw}</{tfSingleParameter}>");
+
       var mbs = new DotNetCoreMSBuildSettings()
           .WithProperty("DocumentationFile",$@"bin\Release\{fw}\Reinforced.Typings.xml");
 
@@ -169,17 +169,17 @@ Task("Build")
           .WithProperty("RtAdditionalConstants",ac)
           .WithProperty("RtNetCore","True");
       }
-     DotNetCorePublish(RtNetCoreProject, new DotNetCorePublishSettings {  
+     DotNetCorePublish(RtNetCoreProject, new DotNetCorePublishSettings {
         Configuration = RELEASE,
-        MSBuildSettings = mbs,    
+        MSBuildSettings = mbs,
         Framework = fw,
         Verbosity = DotNetCoreVerbosity.Quiet,
         OutputDirectory = System.IO.Path.Combine(libPath, fw)
       });
   }
 
-  
-  
+
+
   Information("---------");
   Information("Copying build stuff");
   Information("---------");
@@ -192,7 +192,7 @@ Task("Build")
   Information("---------");
   Information("Writing readme");
   Information("---------");
-  
+
   CopyFileToDirectory("../stuff/license.txt", licenseRoot);
 
   // Copy readme with actual version of Reinforced.Typings.settings.xml
@@ -219,21 +219,21 @@ Task("Build")
 
   Information("---------");
   Information("Packaging");
-  Information("---------");  
+  Information("---------");
 
   var nugetSettings = new ProcessSettings
-    {     
+    {
       Arguments = "nuget.exe pack ../package/Reinforced.Typings.nuspec -OutputDirectory \"../\""
-      //Arguments = "pack ../Reinforced.Typings.sln --no-build --no-restore -p:NuspecFile=../package/Reinforced.Typings.nuspec --output=\"../\"" 
+      //Arguments = "pack ../Reinforced.Typings.sln --no-build --no-restore -p:NuspecFile=../package/Reinforced.Typings.nuspec --output=\"../\""
     };
 
   using(var process = StartAndReturnProcess("mono", nugetSettings))
   //using(var process = StartAndReturnProcess("dotnet", nugetSettings))
   {
-      process.WaitForExit();      
+      process.WaitForExit();
   }
 
-  
+
 
   Information("Build complete");
 });
