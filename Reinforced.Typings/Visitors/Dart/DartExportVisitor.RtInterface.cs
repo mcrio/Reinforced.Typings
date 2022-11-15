@@ -102,6 +102,15 @@ namespace Reinforced.Typings.Visitors.Dart
             WriteLine("factory " + node.Name.TypeName + ".fromJson(Map<String, dynamic> json) => _$" +
                       node.Name.TypeName + "FromJson(json);");
             
+            WriteLine("");
+            if (node.Implementees.Count > 0)
+            {
+                AppendTabs();
+                WriteLine("@override");   
+            }
+            AppendTabs();
+            WriteLine("Map<String, dynamic> toJson() => _$" + node.Name.TypeName + "ToJson(this);");
+            
             UnTab();
             AppendTabs();
 
