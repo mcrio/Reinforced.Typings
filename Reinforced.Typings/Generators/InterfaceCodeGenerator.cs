@@ -17,11 +17,14 @@ namespace Reinforced.Typings.Generators
         /// <param name="element">Element code to be generated to output</param>
         /// <param name="result">Resulting node</param>
         /// <param name="resolver">Type resolver</param>
-        public override RtInterface GenerateNode(Type element,RtInterface result, TypeResolver resolver)
+        public override RtInterface GenerateNode(Type element, RtInterface result, TypeResolver resolver)
         {
             var tc = Context.Project.Blueprint(element).Attr<TsInterfaceAttribute>();
             if (tc == null) throw new ArgumentException("TsInterfaceAttribute is not present", "element");
             Export(result, element, resolver, tc);
+
+            result.OriginalIsAbstractClass = element.IsClass && element.IsAbstract;
+
             return result;
         }
     }

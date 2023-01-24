@@ -18,8 +18,15 @@ namespace Reinforced.Typings.Visitors.Dart
             AppendTabs();
             //if (node.Export) Write("export ");
 
-            //WriteLine("@freezed");
-            WriteLine("@JsonSerializable()");
+            if (!node.OriginalIsAbstractClass)
+            {
+                WriteLine("@JsonSerializable()");
+            }
+
+            if (node.OriginalIsAbstractClass)
+            {
+                Write("abstract ");
+            }
 
             Write("class ");
             Visit(node.Name);
@@ -35,18 +42,18 @@ namespace Reinforced.Typings.Visitors.Dart
             Write("{");
             Br();
             Tab();
-            
+
 
             var constructors = node.Members.OfType<RtConstructor>().ToList();
             constructors.ForEach(item => node.Members.Remove(item));
-            
+
             // custom constructor
             WriteLine(string.Empty);
-            
+
 
             Write(node.Name.TypeName);
             Write("(");
-            
+
 
             node.Members
                 .OfType<RtField>()
@@ -77,6 +84,7 @@ namespace Reinforced.Typings.Visitors.Dart
                     });
                 });
             }
+
             Write(")");
 
             if (implementeesMembers.Count > 0)
@@ -89,7 +97,7 @@ namespace Reinforced.Typings.Visitors.Dart
                 });
                 Write(")");
             }
-            
+
             WriteLine(";");
 
             foreach (var rtMember in DoSortMembers(node.Members))
@@ -98,28 +106,34 @@ namespace Reinforced.Typings.Visitors.Dart
             }
 
             WriteLine("");
-            AppendTabs();
-            WriteLine("factory " + node.Name.TypeName + ".fromJson(Map<String, dynamic> json) => _$" +
-                      node.Name.TypeName + "FromJson(json);");
-            
-            WriteLine("");
-            if (node.Implementees.Count > 0)
+
+            if (!node.OriginalIsAbstractClass)
             {
                 AppendTabs();
-                WriteLine("@override");   
+                WriteLine("factory " + node.Name.TypeName + ".fromJson(Map<String, dynamic> json) => _$" +
+                          node.Name.TypeName + "FromJson(json);");
+
+                WriteLine("");
+
+                if (node.Implementees.Count > 0)
+                {
+                    AppendTabs();
+                    WriteLine("@override");
+                }
+
+                AppendTabs();
+                WriteLine("Map<String, dynamic> toJson() => _$" + node.Name.TypeName + "ToJson(this);");
+
+                UnTab();
+                AppendTabs();
             }
-            AppendTabs();
-            WriteLine("Map<String, dynamic> toJson() => _$" + node.Name.TypeName + "ToJson(this);");
-            
-            UnTab();
-            AppendTabs();
 
 
             WriteLine("}");
             WriteLine("");
             Context = prev;
         }
-        
+
         // public override void Visit(RtInterface node)
         // {
         //     if (node == null) return;

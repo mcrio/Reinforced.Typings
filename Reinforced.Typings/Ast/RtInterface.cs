@@ -19,6 +19,11 @@ namespace Reinforced.Typings.Ast
 
         /// <inheritdoc />
         public List<RtNode> Members { get; private set; }
+        
+        /// <summary>
+        /// Indicates whether the original element is an abstract class.
+        /// </summary>
+        public bool OriginalIsAbstractClass { get; set; }
 
         /// <inheritdoc />
         public override IEnumerable<RtNode> Children

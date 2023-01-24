@@ -16,5 +16,7 @@ namespace Reinforced.Typings.Ast.TypeNames
         ///  used to get implemented interface properties
         /// </summary>
         public List<RtNode> Members { get; private set; } = new List<RtNode>();
+
+        public bool OriginalTypeIsAbstractClass { get; set; } = false;
     }
 }

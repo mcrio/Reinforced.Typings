@@ -323,7 +323,14 @@ namespace Reinforced.Typings
             {
                 if (t.IsArray)
                 {
-                    return Cache(t, new RtArrayType(ResolveTypeName(t.GetElementType())));
+                    Type? elementType = t.GetElementType();
+                    RtTypeName rtElement = ResolveTypeName(elementType);
+                    if (elementType != null && elementType.IsClass && elementType.IsAbstract)
+                    {
+                        rtElement.OriginalTypeIsAbstractClass = true;
+                    }
+                    var rtArray = new RtArrayType(rtElement);
+                    return Cache(t, rtArray);
                 }
                 var enumerable =
                     t._GetInterfaces()
@@ -333,7 +340,15 @@ namespace Reinforced.Typings
                     if (t._IsGenericType() && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) enumerable = t;
                 }
                 if (enumerable == null) return Cache(t, new RtArrayType(AnyType));
-                return Cache(t, new RtArrayType(ResolveTypeName(enumerable.GetArg())));
+                
+                Type? enumerableType = enumerable.GetArg();
+                RtTypeName enumerableRtType = ResolveTypeName(enumerableType);
+                if (enumerableType != null && enumerableType.IsClass && enumerableType.IsAbstract)
+                {
+                    enumerableRtType.OriginalTypeIsAbstractClass = true;
+                }
+                
+                return Cache(t, new RtArrayType(enumerableRtType));
             }
             if (t._IsAsyncType())
             {
